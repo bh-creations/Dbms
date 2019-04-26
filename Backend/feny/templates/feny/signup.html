@@ -1,0 +1,38 @@
+{% load static %}
+
+<<!DOCTYPE html>
+<html>
+<head>
+	<title>SignUp Form</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'feny/stylelogin.css' %}">
+</head>
+<body class = "signup">
+	<div class="signupbox">
+		<img src= "{% static "feny/images/acclogin.png" %}" class="acclogin">
+		<h1>SignUp Here</h1>
+		<form method="post">
+			{% csrf_token %}
+			<!-- <input class = "name" type="text" name="" placeholder="First Name"> -->
+			<!-- <input class = "name" type="text" name="" placeholder="Last Name"> -->
+			<table>
+				<input type="text" name="username" placeholder="Enter Username"><br>
+				<input type="Password" name="password1" placeholder="Enter Password"><br>
+				<input type="Password" name="password2" placeholder="Confirm Password"><br>
+			</table>
+			{% if form.errors %}
+				{% for field in form %}
+					{% for error in field.errors %}
+	            		<div class="alert alert-danger">
+	                		<strong>{{ error|escape }}</strong>
+	            		</div>
+	        		{% endfor %}
+	        	{% endfor %}
+  				<strong>Please try again.</strong>
+			{% endif %}
+			<!-- <input type="text" name="" placeholder="ZIP Code"><br> -->
+			<input type="submit" name="" value="SignUp"><br>
+			<a href="/feny/accounts/login"> Already on Feny!! </a>
+		</form>
+
+</body>
+</html>

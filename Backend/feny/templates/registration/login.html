@@ -1,0 +1,31 @@
+{% load static %}
+
+<<!DOCTYPE html>
+<html>
+<head>
+	<title>Login Form</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'feny/stylelogin.css' %}">
+</head>
+<body>
+	<div class="loginbox">
+		<img src="{% static "feny/images/acclogin.png" %}" class="acclogin">
+		<h1 class = "inhead">Login Here</h1>
+		<form id="login-form" method="post">
+			{% csrf_token %}
+			<table>
+				<p>Username</p>
+				<input type="text" name="username" placeholder="Enter Username">
+				<p>Password</p>
+				<input type="Password" name="password" placeholder="Enter Password">
+			</table>
+			{% if form.errors %}
+  				<p>Your username and password didn't match. Please try again.</p>
+			{% endif %}
+			<input type="submit" name="" value="Login">
+			<input type="hidden" name="next" value="{{ next }}" />
+			<a href="#"> Forgot Password</a><br>
+			<a href="/feny/signup"> Don't have an account </a>
+		</form>
+
+</body>
+</html>
