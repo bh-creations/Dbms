@@ -29,8 +29,9 @@
     Chart.defaults.global.defaultFontFamily = 'Lato';
     Chart.defaults.global.defaultFontSize = 18;
     Chart.defaults.global.defaultFontColor = '#777';
-    var a = {{ popular_city }};
+    var a = {{ data }};
     var b = {{ labels|safe }};
+    var c = {{title|safe }};
     let massPopChart = new Chart(myChart, {
       type:'pie', // bar, horizontalBar, pie, line, doughnut, radar, polarArea
       data:{
@@ -57,7 +58,7 @@
       options:{
         title:{
           display:true,
-          text:'cities with most businesses',
+          text:c,
           fontSize:25
         },
         legend:{

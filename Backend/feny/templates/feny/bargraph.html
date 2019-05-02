@@ -29,14 +29,16 @@
     Chart.defaults.global.defaultFontFamily = 'Lato';
     Chart.defaults.global.defaultFontSize = 18;
     Chart.defaults.global.defaultFontColor = '#777';
-
+    var a = {{ data }};
+    var b = {{ labels|safe }};
+    var c = {{title|safe}};
     let massPopChart = new Chart(myChart, {
       type:'bar', // bar, horizontalBar, pie, line, doughnut, radar, polarArea
       data:{
-        labels:['Shopping', 'Restaurants', 'Home', 'Fitness', 'Arts', 'Health', 'Nightlife', 'Hotel'],
+        labels: b,
         datasets:[{
           label:'N/A',
-          data: {{category_percentage}},
+          data: a,
           //backgroundColor:'green',
           backgroundColor:[
             'rgba(255, 99, 132, 0.6)',
@@ -56,15 +58,11 @@
       options:{
         title:{
           display:true,
-          text:'Category Percentage',
+          text:c,
           fontSize:25
         },
         legend:{
-          display:true,
-          position:'bottom',
-          labels:{
-            fontColor:'#000'
-          }
+          display:false,
         },
         layout:{
           padding:{
@@ -75,7 +73,10 @@
           }
         },
         tooltips:{
-          enabled:true
+          callbacks:{
+            label: tooltipItem => `${tooltipItem.yLabel}: ${tooltipItem.xLabel}`,
+            title: () => null,
+          }
         }
       }
     });
