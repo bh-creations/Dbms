@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/instantsearch.js/1/instantsearch.min.css">
+
+	<title></title>
+</head>
+<body>
+	<header>
+<div id ="input-container">
+	<input id="search-input" placeholder="Search for products">
+	
+</div>
+	</header>
+	<main>
+		<div id="hits"></div>
+		<div id="pagination"></div>
+
+	</main>
+	<script type="text/html" id="hit-template">
+		<div class="hit">
+			<div class="hit-image">
+				<img src="{{image}}" alt="{{name}}">
+			</div>
+			<div class="hit-content">
+				<h3 class="hit-price">${{price}}</h3>
+				<h2 class="hit-name">{{{_highlightResult.name.value}}}</h2>
+				<p class="hit-discription">{{{_highlightResult.description.value}}}</p>
+			</div>
+			
+		</div>
+	</script>
+
+</body>
+<script type="stylesheet" href="https://cdn.jsdelivr.net/instantsearch.js/1/instantsearch.min.js"></script>
+<script type="app.js"></script>
+</html>
