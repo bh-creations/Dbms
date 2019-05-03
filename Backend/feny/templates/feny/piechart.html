@@ -10,9 +10,9 @@
 </head>
 <body>
   <div class="button">
-        <a href="bargraph.html" class="btn"> BarGraph</a>
-
-         </div>
+        <a onclick="myFunction_2()" class="btn"> Go Back</a>
+        <a onclick="myFunction()" class="btn" span style="float:right">Next</span></a>
+        </div>
   <div class="container">
     <canvas id="myChart"></canvas>
         
@@ -23,8 +23,21 @@
   </div>
 
   <script>
+    function myFunction() {
+      if(window.location.href == "http://localhost:8000/feny/piechart/")
+        location.href = "/feny/piechart2";
+      else{
+        location.href = "/feny/linechart";
+      }
+    }
+    function myFunction_2() {
+      if(window.location.href == "http://localhost:8000/feny/piechart/")
+        location.href = "/feny/bargraph";
+      else{
+        location.href = "/feny/piechart/";
+      }
+    }
     let myChart = document.getElementById('myChart').getContext('2d');
-
     // Global Options
     Chart.defaults.global.defaultFontFamily = 'Lato';
     Chart.defaults.global.defaultFontSize = 18;

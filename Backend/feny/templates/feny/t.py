@@ -1,7 +1,12 @@
 import time
 from datetime import date
 
-t = date(2002, 12, 4).isoformat()
-p = '2002-12-04'
-if t == p:
-	print("yes")
+a = {}
+data_1 = [1,2]
+data_2 = [3,4]
+
+if a['key'].append(data_1)
+a['key'].append(data_2)
+a['lock'].append(data_2)
+a['lock'].append(data_1)
+print(a)

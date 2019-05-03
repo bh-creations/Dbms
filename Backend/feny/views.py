@@ -13,9 +13,23 @@ import json
 def index(request):
     if request.method == 'GET':
         info = request.GET
-        if('location' in info):
+        if 'location' in info and 'business' in info:
             city = info['location']
-            row = sql_month_review_star()
+            bname = info['business']
+            row = sql_average_monthly_rating()
+            # row = search_by_business_city(bname,city)
+            print(row)
+        elif 'location' in info:
+            city = info['location']
+            row = search_by_city(city)
+
+            print(row)
+        elif 'business' in info:
+            bname = info['business']
+            row = search_by_business(bname)
+            
+            print(row)
+
     return render(request, 'feny/index.html')
 
 
@@ -75,21 +89,20 @@ class Pie_Review_Distribution(TemplateView):
         for tuple in row:
             final_data.append(float(tuple))
 
-
-        # print(popular_city[0])
         return labels, final_data, title
 
 class Line_Month_Review_Star(TemplateView):
     template_name = 'feny/linechart.html'
     def get_context_data(self, **kwargs):
         context = super(Line_Month_Review_Star, self).get_context_data(**kwargs)
-        context['data_1'],context['data_2'],context['data_3'],context['data_4'],context['data_5'], context['title'] = self.month_review_star()
+        context['data_1'],context['data_2'],context['data_3'],context['data_4'],context['data_5'], context['title'], context['display_format'] = self.month_review_star()
         return context
 
     def month_review_star(self):
         final_data = [[],[],[],[],[]]
 
-        title = ['# of reviews by Month, by # of Stars']
+        title = ['Number of reviews by Month, by number of Stars']
+        display_format = ['YYYY']
         row = sql_month_review_star()
         for tuple in row:
             if tuple[5] is not None and tuple[6] is not None:
@@ -105,9 +118,130 @@ class Line_Month_Review_Star(TemplateView):
         
         # print(json.dumps(final_data[0]))
         # print(popular_city[0])
-        return final_data[0],final_data[1],final_data[2],final_data[3],final_data[4],title
+        return final_data[0],final_data[1],final_data[2],final_data[3],final_data[4],title,display_format
 
 
+class Line_Business_Open(TemplateView):
+    template_name = 'feny/linechart2.html'
+    def get_context_data(self, **kwargs):
+        context = super(Line_Business_Open, self).get_context_data(**kwargs)
+        context['data_1'],context['data_2'],context['data_3'],context['data_4'],context['data_5'], context['labels'], context['title'],context['display_format'] = self.business_open()
+        return context
+
+    def business_open(self):
+        final_data = {}
+        labels = []
+        display_format = ['YYYY']
+        title = ['Number of newly opened business in top 5 popular city by month']
+        row = sql_business_open()
+        for tuple in row:
+            if tuple[0] is not None and tuple[1] is not None and tuple[2] is not None and tuple[3] is not None:
+                point = {}
+                if tuple[3] < 10:
+                    date = str(tuple[2]) + '-0' + str(tuple[3])
+                else:
+                    date = str(tuple[2]) + '-' + str(tuple[3])
+                point['x'] = date
+                point['y'] = tuple[1]
+                if tuple[0] in final_data:
+                    final_data[tuple[0]].append(point)
+                else:
+                    labels.append(tuple[0])
+                    final_data[tuple[0]] = [point]
+        
+        # print(json.dumps(final_data[0]))
+        # print(popular_city[0])
+        return final_data[labels[0]],final_data[labels[1]],final_data[labels[2]],final_data[labels[3]],final_data[labels[4]],labels,title,display_format
+
+class Line_Business_Close(TemplateView):
+    template_name = 'feny/linechart3.html'
+    def get_context_data(self, **kwargs):
+        context = super(Line_Business_Close, self).get_context_data(**kwargs)
+        context['data_1'],context['data_2'],context['data_3'],context['data_4'],context['data_5'], context['labels'], context['title'],context['display_format'] = self.business_close()
+        return context
+
+    def business_close(self):
+        final_data = {}
+        labels = []
+        display_format = ['YYYY']
+        title = ['Number of closed business in top 5 popular city by month']
+        row = sql_business_close()
+        for tuple in row:
+            if tuple[0] is not None and tuple[1] is not None and tuple[2] is not None and tuple[3] is not None:
+                point = {}
+                if tuple[3] < 10:
+                    date = str(tuple[2]) + '-0' + str(tuple[3])
+                else:
+                    date = str(tuple[2]) + '-' + str(tuple[3])
+                point['x'] = date
+                point['y'] = tuple[1]
+                if tuple[0] in final_data:
+                    final_data[tuple[0]].append(point)
+                else:
+                    labels.append(tuple[0])
+                    final_data[tuple[0]] = [point]
+        
+        # print(json.dumps(final_data[0]))
+        # print(popular_city[0])
+        return json.dumps(final_data[labels[0]]),json.dumps(final_data[labels[1]]),json.dumps(final_data[labels[2]]),json.dumps(final_data[labels[3]]),json.dumps(final_data[labels[4]]),labels,title,display_format
+
+class Average_Monthly_Rating(TemplateView):
+    template_name = 'feny/linechart4.html'
+    def get_context_data(self, **kwargs):
+        context = super(Average_Monthly_Rating, self).get_context_data(**kwargs)
+        context['data'],context['labels'], context['title'],context['display_format'] = self.average_monthly_rating()
+        return context
+
+    def average_monthly_rating(self):
+        final_data = [[],[],[],[],[],[]]
+        labels = ['Resatuarant','Shopping','Home','Fitness','Arts','Health']
+        display_format = ['YYYY']
+        title = ['Average rating of categories by month']
+        row = sql_average_monthly_rating()
+        for tuple in row:
+            if tuple[6] is not None and tuple[7] is not None:
+                for i in range(6):
+                    point = {}
+                    if tuple[6] < 10:
+                        date = str(tuple[7]) + '-0' + str(tuple[6])
+                    else:
+                        date = str(tuple[7]) + '-' + str(tuple[6])
+                    point['x'] = date
+                    point['y'] = float(tuple[i])
+                    final_data[i].append(point)
+        
+        # print(json.dumps(final_data[0]))
+        # print(popular_city[0])
+        return final_data,labels,title,display_format
+
+class Average_Monthly_Rating_Cuisine(TemplateView):
+    template_name = 'feny/linechart5.html'
+    def get_context_data(self, **kwargs):
+        context = super(Average_Monthly_Rating_Cuisine, self).get_context_data(**kwargs)
+        context['data'],context['labels'], context['title'],context['display_format'] = self.average_monthly_rating_cuisine()
+        return context
+
+    def average_monthly_rating_cuisine(self):
+        final_data = [[],[],[],[],[],[]]
+        labels = ['American','Chinese','Japanese','Italian','Mexican','Thai']
+        display_format = ['YYYY']
+        title = ['Average rating of cuisine by month']
+        row = sql_average_monthly_rating_cuisine()
+        for tuple in row:
+            if tuple[6] is not None and tuple[7] is not None:
+                for i in range(6):
+                    point = {}
+                    if tuple[6] < 10:
+                        date = str(tuple[7]) + '-0' + str(tuple[6])
+                    else:
+                        date = str(tuple[7]) + '-' + str(tuple[6])
+                    point['x'] = date
+                    point['y'] = float(tuple[i])
+                    final_data[i].append(point)
+        
+        # print(json.dumps(final_data[0]))
+        # print(popular_city[0])
+        return final_data,labels,title,display_format
 
 def signup(request):
     if request.method == 'POST':
@@ -218,7 +352,34 @@ def budget_restaurant(city):
         statement = "SELECT b.name , b.city From business b, attributes a where b.business_id = a.attr_id and a.pricerange = 1 and b.city = %s and b.categories like %s"
         cursor.execute(statement, [city,category])
         row = cursor.fetchone()
-        # print(row)
+
+    return row
+
+def search_by_city(city):
+    with connection.cursor() as cursor:
+        # category = '%Restaurant%'
+        # Search restaurants according to Cuisine
+        statement = "SELECT b.name From business b where b.city = %s"
+        cursor.execute(statement, [city])
+        row = cursor.fetchall()
+    return row
+
+def search_by_business(bname):
+    with connection.cursor() as cursor:
+        name = '%' + bname + '%'
+        # Search restaurants according to Cuisine
+        statement = "SELECT b.name From business b where b.name like %s"
+        cursor.execute(statement, [name])
+        row = cursor.fetchall()
+    return row
+
+def search_by_business_city(bname,city):
+    with connection.cursor() as cursor:
+        name = '%' + bname + '%'
+        # Search restaurants according to Cuisine
+        statement = "SELECT b.name From business b where b.name like %s and b.city = %s"
+        cursor.execute(statement, [name,city])
+        row = cursor.fetchall()
     return row
 
 def search_by_cuisine(cuisine):
@@ -227,8 +388,8 @@ def search_by_cuisine(cuisine):
         # Search restaurants according to Cuisine
         statement = "SELECT b.name From business b where b.categories like %s and b.categories like %s"
         cursor.execute(statement, [category,cuisine])
-        row = cursor.fetchone()
-        # print(row)
+        row = cursor.fetchall()
+
     return row
 
 def deliver_restaurant():
@@ -279,11 +440,200 @@ def cheap_hotel(city):
 def sql_popular_city():
     with connection.cursor() as cursor:
         # Cheap and Decent hotels to stay at in a particular city
-        # statement = "SELECT * From ( SELECT b.city,count(b.business_id) From business b group by b.city order by count(b.business_id) desc) Where rownum = 6"
-        statement = "SELECT * From (SELECT b.city,count(b.business_id) From business b group by b.city order by count(b.business_id) desc) where rownum<=6"
+        statement = "SELECT * From (SELECT b.city as c,count(b.business_id) as cnt \
+                     From business b group by b.city order by count(b.business_id) desc) where rownum<=5 \
+                     UNION \
+                     SELECT'others' as c,sum(cnt) as cnt FROM (SELECT count(b.business_id) as cnt From business b \
+                     group by b.city order by count(b.business_id) desc offset 5 row)"
         cursor.execute(statement)
         row = cursor.fetchall()
     return row
 
+def sql_business_open():
+    with connection.cursor() as cursor:
+
+        statement = "SELECT bc,count(bid),y,m from \
+                    (SELECT b.business_id as bid, b.city as bc, \
+                    extract(year from min(rd.review_date)) as y, extract(month from min(rd.review_date)) as m \
+                    from business b, rateandreview r,reviewdates rd \
+                    where b.business_id=r.r_id and r.r_id=rd.r_id and b.is_open=1 \
+                    group by b.business_id, b.city ) \
+                    where bc in (SELECT * From \
+                    (SELECT b.city From business b group by b.city order by count(b.business_id) desc) where rownum<=5) \
+                    group by y,m,bc \
+                    order by y+m/100 asc"
+        cursor.execute(statement)
+        row = cursor.fetchall()
+
+    return row
+
+def sql_business_close():
+    with connection.cursor() as cursor:
+
+        statement = "SELECT bc,count(bid),y,m from \
+                    (SELECT b.business_id as bid, b.city as bc, \
+                    extract(year from max(rd.review_date)) as y, extract(month from max(rd.review_date)) as m \
+                    from business b, rateandreview r,reviewdates rd \
+                    where b.business_id=r.r_id and r.r_id=rd.r_id and b.is_open=0 \
+                    group by b.business_id, b.city ) \
+                    where bc in (SELECT * From \
+                    (SELECT b.city From business b group by b.city order by count(b.business_id) desc) where rownum<=5) \
+                    group by y,m,bc \
+                    order by y+m/100 asc"
+        cursor.execute(statement)
+        row = cursor.fetchall()
+
+    return row
+
+def sql_average_monthly_rating():
+    with connection.cursor() as cursor:
+        c = ['%Resatuarant%','%Shopping%','%Home%','%Fitness%','%Arts%','%Health%']
+        statement = "SELECT nvl(restaurant_avg,0) , nvl(shopping_avg,0) , nvl(home_avg,0), \
+                    nvl(fitness_avg,0) ,nvl(arts_avg,0),nvl(health_avg,0), mon1 , yy1  from \
+                    ((((((SELECT avg(rateandreview.rating) as restaurant_avg , \
+                    extract(month from reviewdates.review_date) as mon2, \
+                    extract(year from reviewdates.review_date) as yy2  \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) full outer join \
+                    (SELECT avg(rateandreview.rating) as shopping_avg , \
+                    extract(month from reviewdates.review_date) as mon1, \
+                    extract(year from reviewdates.review_date) as yy1 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1=mon2 and yy2=yy1)full outer join \
+                    (SELECT avg(rateandreview.rating) as home_avg , \
+                    extract(month from reviewdates.review_date) as mon3, \
+                    extract(year from reviewdates.review_date) as yy3 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1 = mon3 and yy1 = yy3) full outer join \
+                    (SELECT avg(rateandreview.rating) as fitness_avg , \
+                    extract(month from reviewdates.review_date) as mon4, \
+                    extract(year from reviewdates.review_date) as yy4 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1= mon4 and yy1 = yy4) full outer join \
+                    (SELECT avg(rateandreview.rating) as arts_avg , \
+                    extract(month from reviewdates.review_date) as mon5, \
+                    extract(year from reviewdates.review_date) as yy5 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1 = mon5 and yy1 = yy5) full outer join \
+                    (SELECT avg(rateandreview.rating) as health_avg , \
+                    extract(month from reviewdates.review_date) as mon6, \
+                    extract(year from reviewdates.review_date) as yy6 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1 = mon6 and yy1 = yy6)"
+        cursor.execute(statement, [c[0],c[1],c[2],c[3],c[4],c[5]])
+        row = cursor.fetchall()
+
+    return row
+
+def sql_average_monthly_rating_cuisine():
+
+    with connection.cursor() as cursor:
+        c = ['%American%','%Chinese%','%Japanese%','%Italian%','%Mexican%','%Thai%']
+        statement = "SELECT nvl(restaurant_avg,0) , nvl(shopping_avg,0) , nvl(home_avg,0), \
+                    nvl(fitness_avg,0) ,nvl(arts_avg,0),nvl(health_avg,0), mon1 , yy1  from \
+                    ((((((SELECT avg(rateandreview.rating) as restaurant_avg , \
+                    extract(month from reviewdates.review_date) as mon2, \
+                    extract(year from reviewdates.review_date) as yy2  \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) full outer join \
+                    (SELECT avg(rateandreview.rating) as shopping_avg , \
+                    extract(month from reviewdates.review_date) as mon1, \
+                    extract(year from reviewdates.review_date) as yy1 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1=mon2 and yy2=yy1)full outer join \
+                    (SELECT avg(rateandreview.rating) as home_avg , \
+                    extract(month from reviewdates.review_date) as mon3, \
+                    extract(year from reviewdates.review_date) as yy3 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1 = mon3 and yy1 = yy3) full outer join \
+                    (SELECT avg(rateandreview.rating) as fitness_avg , \
+                    extract(month from reviewdates.review_date) as mon4, \
+                    extract(year from reviewdates.review_date) as yy4 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1= mon4 and yy1 = yy4) full outer join \
+                    (SELECT avg(rateandreview.rating) as arts_avg , \
+                    extract(month from reviewdates.review_date) as mon5, \
+                    extract(year from reviewdates.review_date) as yy5 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1 = mon5 and yy1 = yy5) full outer join \
+                    (SELECT avg(rateandreview.rating) as health_avg , \
+                    extract(month from reviewdates.review_date) as mon6, \
+                    extract(year from reviewdates.review_date) as yy6 \
+                    from reviewdates , rateandreview , business \
+                    where reviewdates.r_id = rateandreview.r_id and \
+                    rateandreview.business_id = business.business_id \
+                    and business.categories like %s \
+                    group by extract(year from reviewdates.review_date), \
+                    extract(month from reviewdates.review_date) \
+                    order by extract(year from reviewdates.review_date)) \
+                    on mon1 = mon6 and yy1 = yy6)"
+        cursor.execute(statement, [c[0],c[1],c[2],c[3],c[4],c[5]])
+        row = cursor.fetchall()
+
+    return row
 # def login(request):
 # 	return render(request, 'accounts/login.html')

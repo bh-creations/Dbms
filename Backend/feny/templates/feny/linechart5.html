@@ -10,37 +10,34 @@
 </head>
 <body>
   <div class="button">
-        <a href="/feny/piechart2" class="btn"> Go Back</a>
-        <a href="/feny/linechart2" class="btn" span style="float:right">Next</span></a>
+        <a href="/feny/linechart4" class="btn"> Go Back</a>
+
          </div>
   <div class="container">
-    <canvas id="lc"></canvas>
+    <canvas id="lc5"></canvas>
         
 
   </div>
   <div>
-    <canvas id="l"></canvas>
+    <canvas id="mylc5"></canvas>
   </div>
 
   <script>
-    let myChart = document.getElementById('lc').getContext('2d');
+    let myChart = document.getElementById('lc5').getContext('2d');
 
     // Global Options
     Chart.defaults.global.defaultFontFamily = 'Lato';
     Chart.defaults.global.defaultFontSize = 18;
     Chart.defaults.global.defaultFontColor = '#777';
-    var a = {{ data_1 | safe}};
-    var b = {{ data_2 | safe}};
-    var c = {{ data_3 | safe}};
-    var d = {{ data_4 | safe}};
-    var e = {{ data_5 | safe}};
+    var a = {{ data | safe}};
+    var labels = {{labels|safe}};
     var display_format = {{display_format|safe}};
     var title = {{title|safe }};
     let massPopChart = new Chart(myChart, {
       type:'line', // bar, horizontalBar, pie, line, doughnut, radar, polarArea
       data:{
         datasets:[{
-          label:'1 star',
+          label: labels[0],
           //backgroundColor:'green',
           backgroundColor:[
             'rgba(255, 99, 132, 0.6)'
@@ -50,10 +47,11 @@
           borderColor:'rgba(255, 99, 132, 1)',
           hoverBorderWidth:1,
           hoverBorderColor:'rgba(255, 99, 132, 1)',
-          data: a
+          fill: false,
+          data: a[0]
         },
         {
-          label:'2 star',
+          label:labels[1],
           //backgroundColor:'green',
           backgroundColor:[
             'rgba(153, 102, 255, 0.6)'
@@ -63,10 +61,11 @@
           borderColor:'rgba(153, 102, 255, 1)',
           hoverBorderWidth:1,
           hoverBorderColor:'#000',
-          data: b
+          fill: false,
+          data: a[1]
         },
         {
-          label:'3 star',
+          label:labels[2],
           //backgroundColor:'green',
           backgroundColor:[
             'rgba(75, 192, 192, 0.6)'
@@ -76,10 +75,11 @@
           borderColor:'rgba(75, 192, 192, 1)',
           hoverBorderWidth:1,
           hoverBorderColor:'#000',
-          data: c
+          fill: false,
+          data: a[2]
         },
         {
-          label:'4 star',
+          label:labels[3],
           //backgroundColor:'green',
           backgroundColor:[
             'rgba(255, 206, 86, 0.6)'
@@ -89,10 +89,11 @@
           borderColor:'rgba(255, 206, 86, 1)',
           hoverBorderWidth:1,
           hoverBorderColor:'#000',
-          data: d
+          fill: false,
+          data: a[3]
         },
         {
-          label:'5 star',
+          label:labels[4],
           //backgroundColor:'green',
           backgroundColor:[
             'rgba(54, 162, 235, 0.6)'
@@ -102,7 +103,22 @@
           borderColor:'rgba(54, 162, 235, 1)',
           hoverBorderWidth:1,
           hoverBorderColor:'#000',
-          data: e
+          fill: false,
+          data: a[4]
+        },
+        {
+          label:labels[5],
+          //backgroundColor:'green',
+          backgroundColor:[
+            'rgba(255, 159, 64, 0.6)'
+          ],
+          borderWidth:1,
+          pointRadius:0,
+          borderColor:'rgba(255, 159, 64, 1)',
+          hoverBorderWidth:1,
+          hoverBorderColor:'#000',
+          fill: false,
+          data: a[5]
         }]
       },
       options:{
@@ -112,13 +128,13 @@
                 type: 'time',
                 time: {
                     displayFormats: {
-                        quarter: display_format
+                        quarter: display_format[0]
                     }
                 },
-                distribution: 'series',
+                distribution: 'linear',
                 scaleLabel: {
                   display: true,
-                  labelString: 'Date of Review Submission'
+                  labelString: 'dates'
                 }
             }],
             yAxes:[{
@@ -126,7 +142,7 @@
               type: 'linear',
               scaleLabel: {
                 display: true,
-                labelString: 'Total number of Review Submissions(by Month)'
+                labelString: 'Average Rating'
               }
             }]
         },

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'algoliasearch_django',
 ]
 
 MIDDLEWARE = [
@@ -104,7 +105,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# ALGOLIA Search
+ALGOLIA = {
+    'APPLICATION_ID': '41WVOJCLBK',
+    'API_KEY': 'b49b156c22d16f2da5f23d131c97bc80'
+}
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
